@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "npm install && vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.3",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dompurify": "^3.1.6",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
+    "jsdom": "^24.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.16.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "jest": "^30.0.4"
+  }
+}

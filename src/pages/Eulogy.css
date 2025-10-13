@@ -1,0 +1,102 @@
+.eulogy-subheading {
+  font-family: "TT Chocolates Trial DemiBold", sans-serif;
+  font-size: 1.5rem;
+  text-align: center;
+  color: hsl(var(--gold));
+  margin-bottom: 1rem;
+}
+
+/* Eulogy content styling with heading detection */
+.eulogy-content {
+  color: rgb(229, 231, 235);
+  line-height: 1.75;
+}
+
+.eulogy-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #D4AF37;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-family: "TT Chocolates Trial DemiBold", sans-serif;
+}
+
+.eulogy-content h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #D4AF37;
+  margin-top: 1.75rem;
+  margin-bottom: 0.875rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  padding-bottom: 0.5rem;
+  font-family: "TT Chocolates Trial DemiBold", sans-serif;
+}
+
+.eulogy-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #E5C771;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-family: "TT Chocolates Trial DemiBold", sans-serif;
+}
+
+.eulogy-content h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #E5C771;
+  margin-top: 1.25rem;
+  margin-bottom: 0.625rem;
+}
+
+.eulogy-content h5,
+.eulogy-content h6 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #E5C771;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.eulogy-content p {
+  margin-bottom: 1rem;
+  color: rgb(209, 213, 219);
+}
+
+.eulogy-content ul,
+.eulogy-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  color: rgb(209, 213, 219);
+}
+
+.eulogy-content li {
+  margin-bottom: 0.5rem;
+}
+
+.eulogy-content blockquote {
+  border-left: 4px solid #D4AF37;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: rgb(156, 163, 175);
+}
+
+.eulogy-content strong {
+  font-weight: 700;
+  color: rgb(243, 244, 246);
+}
+
+.eulogy-content em {
+  font-style: italic;
+}
+
+.eulogy-content a {
+  color: #D4AF37;
+  text-decoration: underline;
+}
+
+.eulogy-content a:hover {
+  color: #E5C771;
+}

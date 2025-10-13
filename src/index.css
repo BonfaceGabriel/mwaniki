@@ -1,0 +1,301 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Cinzel-Bold";
+  src: url("/fonts/Cinzel-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "TT Chocolates Trial Light";
+  src: url("/fonts/TT Chocolates Trial Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "TT Chocolates Trial DemiBold";
+  src: url("/fonts/TT Chocolates Trial DemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cinzel Decorative";
+  src: url("/fonts/CinzelDecorative-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "TT Chocolates";
+  src: url("/fonts/TT Chocolates Trial Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "TT Chocolates";
+  src: url("/fonts/TT Chocolates Trial Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 280 100% 30%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 280 50% 20%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 280 100% 30%;
+
+    --radius: 0.5rem;
+
+    --gold: 45 100% 35%;
+    --gold-light: 45 100% 50%;
+    --purple-dark: 280 100% 15%;
+    --purple-medium: 280 100% 30%;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 280 100% 30%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 280 50% 20%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 280 100% 30%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom color utilities */
+.text-gold {
+  color: hsl(var(--gold));
+}
+
+.text-gold-light {
+  color: hsl(var(--gold-light));
+}
+
+.bg-purple-dark {
+  background-color: hsl(var(--purple-dark));
+}
+
+.bg-purple-medium {
+  background-color: hsl(var(--purple-medium));
+}
+
+.border-gold {
+  border-color: hsl(var(--gold));
+}
+
+/* Background parallax effect */
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Seamless scrolling background */
+.scroll-bg {
+  background-image: url("/lovable-uploads/9b3d3675-5129-47d9-8118-83f63cff5e3e.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Fade overlay for sections */
+.fade-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.3) 30%,
+    rgba(0, 0, 0, 0.7) 70%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+}
+
+/* Gold shimmer effect - replaced with subtle glow */
+@keyframes subtle-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 5px hsl(var(--gold) / 0.3);
+  }
+  50% {
+    text-shadow: 0 0 10px hsl(var(--gold) / 0.5);
+  }
+}
+
+.subtle-glow {
+  animation: subtle-glow 3s ease-in-out infinite;
+}
+
+/* Masonry grid for collage layout */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-auto-rows: 150px;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .masonry-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .masonry-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .masonry-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Enhanced animations */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.4s ease-out forwards;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-purple-medium hover:bg-primary text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg;
+}
+
+.btn-secondary {
+  @apply bg-transparent border-2 border-gold text-gold hover:bg-gold hover:text-black font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+}
+
+/* Consistent typography */
+h1 {
+  @apply text-4xl md:text-5xl font-bold text-gold-light;
+  font-family: "Cinzel-Bold", cursive;
+}
+
+h2 {
+  @apply text-3xl md:text-4xl font-semibold text-gold;
+  font-family: "Cinzel-Bold", cursive;
+}
+
+p {
+  @apply text-base md:text-lg;
+  font-family: "TT Chocolates", sans-serif;
+  font-weight: 500;
+}
+
+h3 {
+  @apply text-xl md:text-2xl font-medium;
+  font-family: "TT Chocolates", sans-serif;
+  font-weight: 700;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .scroll-bg {
+    background-attachment: scroll;
+  }
+}

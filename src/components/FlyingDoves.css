@@ -1,0 +1,36 @@
+.flying-doves-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999; /* Ensure doves are on top */
+}
+
+.flying-dove {
+  position: absolute;
+  font-size: 2rem; /* Adjust size as needed */
+  opacity: 0.6; /* Adjust opacity as needed */
+  animation: fly-across 20s linear infinite;
+}
+
+@keyframes fly-across {
+  0% {
+    transform: translateX(100vw) translateY(0vh); /* Start off-screen to the right */
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateX(50vw) translateY(10vh); /* Mid-point with slight vertical drift */
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateX(-100vw) translateY(0vh); /* End off-screen to the left */
+    opacity: 0;
+  }
+}
