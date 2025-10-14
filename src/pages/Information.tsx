@@ -46,6 +46,12 @@ interface SiteSettings {
   bank_account_number?: string;
   bank_account_name?: string;
   family_name?: string;
+  memorial_event_1_title?: string;
+  memorial_event_1_date?: string;
+  memorial_event_1_location?: string;
+  memorial_event_2_title?: string;
+  memorial_event_2_date?: string;
+  memorial_event_2_location?: string;
 }
 
 const Information = () => {
@@ -214,9 +220,6 @@ const Information = () => {
     );
   }
 
-  // Get first two events for the cards
-  const firstTwoEvents = updates.slice(0, 2);
-
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Background with seamless scroll */}
@@ -236,22 +239,40 @@ const Information = () => {
             </p>
           </div>
 
-          {firstTwoEvents.length >= 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              <EventCard
-                icon="church"
-                title={firstTwoEvents[0].title.toUpperCase()}
-                date={firstTwoEvents[0].date}
-                location={firstTwoEvents[0].venue}
-              />
-              <EventCard
-                icon="cross"
-                title={firstTwoEvents[1].title.toUpperCase()}
-                date={firstTwoEvents[1].date}
-                location={firstTwoEvents[1].venue}
-              />
-            </div>
-          )}
+          {/* Event Cards - show first two events from DB or fall back to site settings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            {updates.length >= 2 ? (
+              <>
+                <EventCard
+                  icon="church"
+                  title={updates[0].title.toUpperCase()}
+                  date={updates[0].date}
+                  location={updates[0].venue}
+                />
+                <EventCard
+                  icon="cross"
+                  title={updates[1].title.toUpperCase()}
+                  date={updates[1].date}
+                  location={updates[1].venue}
+                />
+              </>
+            ) : (
+              <>
+                <EventCard
+                  icon="church"
+                  title={siteSettings?.memorial_event_1_title?.toUpperCase() || "MEMORIAL SERVICE"}
+                  date={siteSettings?.memorial_event_1_date || "Date TBD"}
+                  location={siteSettings?.memorial_event_1_location || "Location TBD"}
+                />
+                <EventCard
+                  icon="cross"
+                  title={siteSettings?.memorial_event_2_title?.toUpperCase() || "FUNERAL SERVICE"}
+                  date={siteSettings?.memorial_event_2_date || "Date TBD"}
+                  location={siteSettings?.memorial_event_2_location || "Location TBD"}
+                />
+              </>
+            )}
+          </div>
 
           {isAdmin && (
             <div className="mb-6 flex justify-end">
