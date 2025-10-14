@@ -63,10 +63,74 @@ const Gallery = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<number[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Resize if image is too large (max 1920px width)
+          const MAX_WIDTH = 1920;
+          const MAX_HEIGHT = 1920;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height = (height * MAX_WIDTH) / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width = (width * MAX_HEIGHT) / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            },
+            'image/jpeg',
+            0.85 // Quality (85%)
+          );
+        };
+      };
+    });
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setSelectedFiles(Array.from(event.target.files));
+      const files = Array.from(event.target.files);
+      // Show loading state
+      toast.info('Preparing images...');
+
+      // Compress images for faster upload
+      const compressedFiles = await Promise.all(
+        files.map(file => compressImage(file))
+      );
+
+      setSelectedFiles(compressedFiles);
+      toast.success('Images ready for upload!');
     }
   };
 
@@ -100,6 +164,7 @@ const Gallery = () => {
         setUploaderEmail("");
         setCaption("");
         setSelectedFiles([]);
+        setIsUploadDialogOpen(false); // Close dialog after successful upload
         toast.success("Photo(s) uploaded successfully!");
         // Refresh photos after upload
         fetch(`${API_BASE_URL}/photos`)
@@ -157,12 +222,14 @@ const Gallery = () => {
       setPhotos((prevPhotos) =>
         prevPhotos.filter((photo) => !photoIds.includes(photo.id))
       );
-      setSelectedImage(null);
+      setSelectedImage(null); // Close full image view
       setSelectedPhotos([]);
       setIsSelectionMode(false);
       setShowMultiDeleteConfirm(false); // Close the dialog after deletion
       setSelectedPhotosToDelete([]); // Clear the photos to delete
       toast.success("Selected photo(s) deleted successfully!");
+      // Scroll to gallery view
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Error deleting photos:", error);
       toast.error("Failed to delete selected photo(s).");
@@ -262,82 +329,95 @@ const Gallery = () => {
 
           <div className="w-full">
             <div className="mt-8 flex justify-center space-x-4">
-              <Dialog>
+              <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="btn-primary">Upload Photos</Button>
                 </DialogTrigger>
-                <br />
-                <DialogContent className="sm:max-w-[425px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20 data-[state=open]:pb-32 data-[state=open]:sm:pb-0">
+                <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-purple-dark/95 border border-gold/30 text-white shadow-lg shadow-gold/20">
                   <DialogHeader>
-                    <DialogTitle className="text-gold">
+                    <DialogTitle className="text-gold text-xl">
                       UPLOAD PHOTOS
                     </DialogTitle>
-                    <DialogDescription className="text-gray-300">
+                    <DialogDescription className="text-gray-300 text-sm">
                       SHARE YOUR CHERISHED MEMORIES. ALL FIELDS ARE OPTIONAL.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="name" className="text-right">
-                        YOUR NAME
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-gold text-sm font-semibold">
+                        Your Name
                       </Label>
                       <Input
                         id="name"
                         value={uploaderName}
                         onChange={(e) => setUploaderName(e.target.value)}
-                        className="col-span-3"
+                        placeholder="Enter your full name (optional)"
+                        className="w-full bg-black/50 border-gold/30 text-white placeholder:text-gray-500"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="email" className="text-right">
-                        YOUR EMAIL
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-gold text-sm font-semibold">
+                        Your Email
                       </Label>
                       <Input
                         id="email"
                         type="email"
                         value={uploaderEmail}
                         onChange={(e) => setUploaderEmail(e.target.value)}
-                        className="col-span-3"
+                        placeholder="Enter your email address (optional)"
+                        className="w-full bg-black/50 border-gold/30 text-white placeholder:text-gray-500"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="caption" className="text-right">
-                        CAPTION
+                    <div className="space-y-2">
+                      <Label htmlFor="caption" className="text-gold text-sm font-semibold">
+                        Caption
                       </Label>
                       <Input
                         id="caption"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
-                        className="col-span-3"
+                        placeholder="Add a caption to your photos (optional)"
+                        className="w-full bg-black/50 border-gold/30 text-white placeholder:text-gray-500"
                       />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="picture" className="text-right">
-                        PICTURES
+                    <div className="space-y-2">
+                      <Label htmlFor="picture" className="text-gold text-sm font-semibold">
+                        Select Photos
                       </Label>
                       <Input
                         id="picture"
                         type="file"
                         multiple
+                        accept="image/*"
                         onChange={handleFileChange}
-                        className="col-span-3"
+                        className="w-full bg-black/50 border-gold/30 text-white file:bg-gold/20 file:text-gold file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-gold/30"
                       />
                     </div>
                     {selectedFiles.length > 0 && (
-                      <div className="text-sm text-right text-gray-500 col-span-4">
-                        {selectedFiles.length} file(s) selected
+                      <div className="bg-black/30 p-3 rounded-lg border border-gold/20">
+                        <p className="text-sm text-gold mb-2">
+                          {selectedFiles.length} photo{selectedFiles.length > 1 ? 's' : ''} selected
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedFiles.map((file, idx) => (
+                            <div key={idx} className="text-xs text-gray-400 bg-black/40 px-2 py-1 rounded">
+                              {file.name}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-                  <DialogFooter>
+                  <DialogFooter className="flex-col sm:flex-row gap-2">
                     <Button
                       type="submit"
                       onClick={handleUpload}
                       disabled={selectedFiles.length === 0 || uploading}
+                      className="w-full sm:w-auto bg-gold hover:bg-gold/80 text-black font-semibold"
                     >
                       {uploading
                         ? "Uploading..."
-                        : `Upload ${selectedFiles.length} Photo(s)`}
+                        : `Upload ${selectedFiles.length} Photo${selectedFiles.length > 1 ? 's' : ''}`}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

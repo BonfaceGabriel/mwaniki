@@ -355,3 +355,68 @@ h3 {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Mobile optimization - Better touch targets and spacing */
+@media (max-width: 768px) {
+  /* Improve touch target sizes for mobile */
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  .btn-primary,
+  .btn-secondary {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better spacing for mobile forms */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+
+  /* Optimize dialog scrolling on mobile */
+  [role="dialog"] {
+    touch-action: pan-y;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Smoother scrolling on mobile */
+  * {
+    -webkit-tap-highlight-color: rgba(212, 175, 55, 0.2);
+    -webkit-touch-callout: none;
+  }
+
+  /* Better image loading on mobile */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Performance optimization - GPU acceleration */
+.transform,
+.transition-transform,
+[class*="hover:scale"],
+[class*="animate"] {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus states for accessibility */
+*:focus-visible {
+  outline: 2px solid hsl(var(--gold));
+  outline-offset: 2px;
+}

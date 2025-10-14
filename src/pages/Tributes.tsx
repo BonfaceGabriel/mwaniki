@@ -7,6 +7,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Trash2 } from "lucide-react";
 import useAuth from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -65,6 +66,7 @@ const Tributes = () => {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTributes, setSelectedTributes] = useState<number[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
+  const [isTributeDialogOpen, setIsTributeDialogOpen] = useState(false);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/site-settings`)
@@ -173,8 +175,11 @@ const Tributes = () => {
           type: "tribute",
         });
         setSelectedFiles([]);
+        setIsTributeDialogOpen(false); // Close dialog after successful submission
         fetchTributes();
         toast.success("Thank you for sharing your tribute!");
+        // Scroll to top to see the new tribute
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         throw new Error("Failed to submit tribute");
       }
@@ -264,9 +269,11 @@ const Tributes = () => {
               WORDS OF REMEMBRANCE
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6"></div>
+            <p className="text-lg text-gray-300">
               SHARE YOUR MEMORIES AND THOUGHTS ABOUT{" "}
               {siteSettings?.deceased_name?.toUpperCase() || "..."}
-
+            </p>
+            {isAdmin && (
               <div className="mt-4 flex justify-center space-x-4">
                 <Button
                   className="btn-secondary"
@@ -290,13 +297,13 @@ const Tributes = () => {
 
           {/* Tribute Form */}
           <div className="bg-purple-dark/50 backdrop-blur-sm border border-gold/30 rounded-lg p-6 md:p-8 mb-8 shadow-2xl">
-            <Dialog>
+            <Dialog open={isTributeDialogOpen} onOpenChange={setIsTributeDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="w-full bg-primary hover:bg-primary/80 transition-all duration-300 text-white font-semibold py-3">
                   WRITE A TRIBUTE
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[625px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20 data-[state=open]:pb-32 data-[state=open]:sm:pb-0">
+              <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto bg-purple-dark/95 border border-gold/30 text-white shadow-lg shadow-gold/20">
                 <DialogHeader>
                   <DialogTitle className="text-gold">
                     SHARE YOUR TRIBUTE
@@ -307,24 +314,36 @@ const Tributes = () => {
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input
-                      placeholder="Your Name (Optional)"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
-                    />
-                    <Input
-                      placeholder="Your Relationship (e.g., Friend, Colleague) *"
-                      value={formData.relationship}
-                      onChange={(e) =>
-                        setFormData({ ...formData, relationship: e.target.value })
-                      }
-                      required
-                      className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
-                    />
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="tribute-name" className="text-gold text-sm font-semibold">
+                        Your Name (Optional)
+                      </Label>
+                      <Input
+                        id="tribute-name"
+                        placeholder="Enter your full name"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        className="bg-black/50 border-gold/30 text-white placeholder:text-gray-500 focus:border-gold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="tribute-relationship" className="text-gold text-sm font-semibold">
+                        Your Relationship *
+                      </Label>
+                      <Input
+                        id="tribute-relationship"
+                        placeholder="e.g., Friend, Colleague, Family Member"
+                        value={formData.relationship}
+                        onChange={(e) =>
+                          setFormData({ ...formData, relationship: e.target.value })
+                        }
+                        required
+                        className="bg-black/50 border-gold/30 text-white placeholder:text-gray-500 focus:border-gold"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm text-gray-300 mb-2">
