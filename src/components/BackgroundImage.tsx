@@ -6,7 +6,7 @@ interface BackgroundImageProps {
   opacity?: number;
 }
 
-const BackgroundImage = ({ opacity = 0.15 }: BackgroundImageProps) => {
+const BackgroundImage = ({ opacity = 0.2 }: BackgroundImageProps) => {
   const [backgroundUrl, setBackgroundUrl] = useState<string>("");
 
   useEffect(() => {
@@ -14,7 +14,8 @@ const BackgroundImage = ({ opacity = 0.15 }: BackgroundImageProps) => {
       .then((response) => response.json())
       .then((data) => {
         setBackgroundUrl(
-          data.background_photo_url || "/lovable-uploads/placeholder-background.jpg"
+          data.background_photo_url ||
+            "/lovable-uploads/placeholder-background.jpg"
         );
       })
       .catch((error) => {

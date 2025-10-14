@@ -127,6 +127,52 @@ All colors MUST be HSL.
   }
 }
 
+/* Global card styling with rounded corners and softer shadows */
+.card,
+[class*="card"],
+.bg-black\/50,
+.bg-black\/60,
+.bg-black\/70,
+.bg-black\/80,
+.bg-black\/90,
+.backdrop-blur,
+[class*="backdrop-blur"] {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
+              0 2px 4px -1px rgba(0, 0, 0, 0.16),
+              0 0 0 1px rgba(212, 175, 55, 0.05);
+}
+
+/* Elevated elements with softer shadows */
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2),
+              0 4px 6px -2px rgba(0, 0, 0, 0.15),
+              0 0 0 1px rgba(212, 175, 55, 0.08) !important;
+}
+
+.hover\:shadow-lg:hover,
+.hover\:shadow-xl:hover {
+  box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.25),
+              0 8px 10px -6px rgba(0, 0, 0, 0.2),
+              0 0 0 1px rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Section spacing utilities */
+section,
+.section,
+[class*="space-y-"] > * {
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  section,
+  .section {
+    margin-bottom: 4rem;
+  }
+}
+
 /* Custom color utilities */
 .text-gold {
   color: hsl(var(--gold));

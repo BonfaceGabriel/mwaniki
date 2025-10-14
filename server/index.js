@@ -111,21 +111,52 @@ app.get("/tributes", async (_req, res) => {
   }
 });
 
-app.post("/tributes", clearCache("tributes"), async (req, res) => {
-  const { name, relationship, message, type } = req.body;
-  const sanitizedMessage = DOMPurify.sanitize(message);
-  const id = uuidv4();
-  try {
-    const { rows } = await pool.query(
-      "INSERT INTO tributes (id, name, relationship, message, type) VALUES ($1,$2,$3,$4,$5) RETURNING *",
-      [id, name, relationship, sanitizedMessage, type],
-    );
-    res.status(201).json(rows[0]);
-  } catch (err) {
-    console.error("Error posting tribute:", err);
-    res.status(500).json({ error: "Failed to post tribute." });
+app.post(
+  "/tributes",
+  upload.single("photo"),
+  clearCache("tributes"),
+  async (req, res) => {
+    const { name, relationship, message, type } = req.body;
+    const sanitizedMessage = DOMPurify.sanitize(message);
+    const id = uuidv4();
+    let photoUrl = null;
+
+    try {
+      // Handle optional photo upload
+      if (req.file) {
+        const file = req.file;
+        const filename = `tribute-${id}${path.extname(file.originalname)}`;
+
+        // Upload to Supabase Storage
+        const { error: uploadErr } = await supabase.storage
+          .from(BUCKET)
+          .upload(filename, file.buffer, {
+            contentType: file.mimetype,
+            upsert: true,
+          });
+
+        if (uploadErr) throw uploadErr;
+
+        // Get public URL
+        const { data: pub } = supabase.storage
+          .from(BUCKET)
+          .getPublicUrl(filename);
+
+        photoUrl = pub.publicUrl;
+      }
+
+      // Insert tribute with optional photo_url
+      const { rows } = await pool.query(
+        "INSERT INTO tributes (id, name, relationship, message, type, photo_url) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
+        [id, name, relationship, sanitizedMessage, type, photoUrl],
+      );
+      res.status(201).json(rows[0]);
+    } catch (err) {
+      console.error("Error posting tribute:", err);
+      res.status(500).json({ error: "Failed to post tribute." });
+    }
   }
-});
+);
 
 app.delete(
   "/tributes/:id",

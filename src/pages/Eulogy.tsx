@@ -83,7 +83,7 @@ const Eulogy = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white relative">
-        <BackgroundImage opacity={0.3} />
+        <BackgroundImage />
         <Navigation />
         <div className="relative z-10 flex items-center justify-center min-h-[50vh]">
           <Loader2 className="w-8 h-8 animate-spin text-gold" />
@@ -95,7 +95,7 @@ const Eulogy = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative">
-      <BackgroundImage opacity={0.3} />
+      <BackgroundImage />
 
       <Navigation />
 
@@ -134,11 +134,26 @@ const Eulogy = () => {
                     <span>💡</span> Formatting Tips
                   </h4>
                   <ul className="text-sm text-blue-200 space-y-1">
-                    <li><strong>Title:</strong> Use the first dropdown (select "Heading 1") for the main title</li>
-                    <li><strong>Sections:</strong> Use "Heading 2" for section titles like "Early Life", "Career", etc.</li>
-                    <li><strong>Subsections:</strong> Use "Heading 3" for smaller subsections</li>
-                    <li><strong>Regular Text:</strong> Use "Normal" for paragraphs and stories</li>
-                    <li><strong>Bold/Italic:</strong> Use the <strong>B</strong> and <em>I</em> buttons for emphasis</li>
+                    <li>
+                      <strong>Title:</strong> Use the first dropdown (select
+                      "Heading 1") for the main title
+                    </li>
+                    <li>
+                      <strong>Sections:</strong> Use "Heading 2" for section
+                      titles like "Early Life", "Career", etc.
+                    </li>
+                    <li>
+                      <strong>Subsections:</strong> Use "Heading 3" for smaller
+                      subsections
+                    </li>
+                    <li>
+                      <strong>Regular Text:</strong> Use "Normal" for paragraphs
+                      and stories
+                    </li>
+                    <li>
+                      <strong>Bold/Italic:</strong> Use the <strong>B</strong>{" "}
+                      and <em>I</em> buttons for emphasis
+                    </li>
                   </ul>
                 </div>
                 <ReactQuill
@@ -209,7 +224,9 @@ const Eulogy = () => {
                 <div className="text-center text-gray-400 py-12">
                   <p>No life story has been written yet.</p>
                   {isAdmin && (
-                    <p className="mt-2">Click "Edit Life Story" to add content.</p>
+                    <p className="mt-2">
+                      Click "Edit Life Story" to add content.
+                    </p>
                   )}
                 </div>
               )}

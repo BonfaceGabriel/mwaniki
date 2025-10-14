@@ -33,6 +33,7 @@ interface Tribute {
   message: string;
   timestamp: string;
   type: string;
+  photo_url?: string;
 }
 
 const Tributes = () => {
@@ -45,6 +46,8 @@ const Tributes = () => {
     message: "",
     type: "tribute",
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const { isAdmin } = useAuth();
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTributes, setSelectedTributes] = useState<number[]>([]);
@@ -125,12 +128,19 @@ const Tributes = () => {
     setIsSubmitting(true);
 
     try {
+      const submitData = new FormData();
+      submitData.append("name", formData.name);
+      submitData.append("relationship", formData.relationship);
+      submitData.append("message", formData.message);
+      submitData.append("type", formData.type);
+
+      if (selectedFile) {
+        submitData.append("photo", selectedFile);
+      }
+
       const response = await fetch(`${API_BASE_URL}/tributes`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: submitData,
       });
 
       if (response.ok) {
@@ -140,6 +150,7 @@ const Tributes = () => {
           message: "",
           type: "tribute",
         });
+        setSelectedFile(null);
         fetchTributes();
         toast.success("Thank you for sharing your tribute!");
       } else {
@@ -280,6 +291,22 @@ const Tributes = () => {
                   className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
                 />
               </div>
+              <div>
+                <label className="block text-sm text-gray-300 mb-2">
+                  Attach a Photo (Optional)
+                </label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  className="bg-black/50 border-gold/30 text-white file:bg-gold/20 file:text-gold file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-gold/30"
+                />
+                {selectedFile && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    Selected: {selectedFile.name}
+                  </p>
+                )}
+              </div>
               <ReactQuill
                 theme="snow"
                 value={formData.message}
@@ -383,15 +410,35 @@ const Tributes = () => {
                     dangerouslySetInnerHTML={{ __html: tribute.message }}
                   />
                   <div className="flex justify-between items-end">
-                    <div>
-                      <p className="font-bold text-gold text-lg">
-                        {tribute.name || tribute.relationship}
-                      </p>
-                      {tribute.name && (
-                        <p className="text-sm text-gray-400">
-                          {tribute.relationship}
-                        </p>
+                    <div className="flex items-center gap-3">
+                      {tribute.photo_url && (
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPhotoUrl(tribute.photo_url!);
+                          }}
+                          className="cursor-pointer group relative flex-shrink-0"
+                        >
+                          <img
+                            src={tribute.photo_url}
+                            alt="Tribute photo"
+                            className="w-16 h-16 object-cover rounded-lg border-2 border-gold/30 group-hover:border-gold transition-all duration-200 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
+                            <span className="text-white text-xs">View</span>
+                          </div>
+                        </div>
                       )}
+                      <div>
+                        <p className="font-bold text-gold text-lg">
+                          {tribute.name || tribute.relationship}
+                        </p>
+                        {tribute.name && (
+                          <p className="text-sm text-gray-400">
+                            {tribute.relationship}
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <p className="text-xs text-gray-500">
                       {formatDate(tribute.timestamp)}
@@ -402,6 +449,28 @@ const Tributes = () => {
             )}
           </div>
         </main>
+
+        {/* Full-size photo modal */}
+        {selectedPhotoUrl && (
+          <div
+            className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setSelectedPhotoUrl(null)}
+          >
+            <div className="relative max-w-4xl max-h-[90vh] animate-scale-in">
+              <img
+                src={selectedPhotoUrl}
+                alt="Tribute photo full size"
+                className="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
+              />
+              <button
+                onClick={() => setSelectedPhotoUrl(null)}
+                className="absolute top-4 right-4 w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-colors text-xl"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
 
         <Footer />
       </div>
