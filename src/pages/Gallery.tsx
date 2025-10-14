@@ -157,6 +157,7 @@ const Gallery = () => {
       setPhotos((prevPhotos) =>
         prevPhotos.filter((photo) => !photoIds.includes(photo.id))
       );
+      setSelectedImage(null);
       setSelectedPhotos([]);
       setIsSelectionMode(false);
       setShowMultiDeleteConfirm(false); // Close the dialog after deletion
@@ -266,7 +267,7 @@ const Gallery = () => {
                   <Button className="btn-primary">Upload Photos</Button>
                 </DialogTrigger>
                 <br />
-                <DialogContent className="sm:max-w-[425px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20">
+                <DialogContent className="sm:max-w-[425px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20 data-[state=open]:pb-32 data-[state=open]:sm:pb-0">
                   <DialogHeader>
                     <DialogTitle className="text-gold">
                       UPLOAD PHOTOS

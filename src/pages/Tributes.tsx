@@ -12,6 +12,15 @@ import useAuth from "@/hooks/use-auth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -36,6 +45,10 @@ interface Tribute {
   photos?: string[];
 }
 
+interface SiteSettings {
+  deceased_name: string;
+}
+
 const Tributes = () => {
   const [tributes, setTributes] = useState<Tribute[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,8 +64,16 @@ const Tributes = () => {
   const { isAdmin } = useAuth();
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTributes, setSelectedTributes] = useState<number[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
+    fetch(`${API_BASE_URL}/site-settings`)
+      .then((response) => response.json())
+      .then((data) => {
+        setSiteSettings(data);
+      })
+      .catch((error) => console.error("Error fetching site settings:", error));
+
     fetchTributes().then(() => {
       const hash = window.location.hash;
       if (hash) {
@@ -184,9 +205,10 @@ const Tributes = () => {
               WORDS OF REMEMBRANCE
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300">
-              SHARE YOUR MEMORIES AND THOUGHTS ABOUT BERNARD "BK" KASEMA
-            </p>
+              <p className="text-lg text-gray-300">
+                SHARE YOUR MEMORIES AND THOUGHTS ABOUT{" "}
+                {siteSettings?.deceased_name?.toUpperCase() || "..."}
+              </p>
           </div>
           <div className="bg-purple-dark/50 backdrop-blur-sm border border-gold/30 rounded-lg p-6 md:p-8 mb-8 shadow-2xl">
             <h2 className="text-2xl font-tt-chocolates-demibold text-gold mb-6 uppercase flex items-center">
@@ -242,10 +264,9 @@ const Tributes = () => {
               WORDS OF REMEMBRANCE
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300">
-              SHARE YOUR MEMORIES AND THOUGHTS ABOUT BERNARD "BK" KASEMA
-            </p>
-            {isAdmin && (
+              SHARE YOUR MEMORIES AND THOUGHTS ABOUT{" "}
+              {siteSettings?.deceased_name?.toUpperCase() || "..."}
+
               <div className="mt-4 flex justify-center space-x-4">
                 <Button
                   className="btn-secondary"
@@ -269,106 +290,121 @@ const Tributes = () => {
 
           {/* Tribute Form */}
           <div className="bg-purple-dark/50 backdrop-blur-sm border border-gold/30 rounded-lg p-6 md:p-8 mb-8 shadow-2xl">
-            <h2 className="text-2xl font-tt-chocolates-demibold text-gold mb-6 uppercase flex items-center">
-              SHARE YOUR TRIBUTE
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="Your Name (Optional)"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
-                />
-                <Input
-                  placeholder="Your Relationship (e.g., Friend, Colleague) *"
-                  value={formData.relationship}
-                  onChange={(e) =>
-                    setFormData({ ...formData, relationship: e.target.value })
-                  }
-                  required
-                  className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-300 mb-2">
-                  Attach Photos (Optional - Max 5)
-                </label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []);
-                    if (files.length > 5) {
-                      toast.error("You can only upload up to 5 photos");
-                      return;
-                    }
-                    setSelectedFiles(files);
-                  }}
-                  className="bg-black/50 border-gold/30 text-white file:bg-gold/20 file:text-gold file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-gold/30"
-                />
-                {selectedFiles.length > 0 && (
-                  <div className="mt-2">
-                    <p className="text-xs text-gray-400 mb-2">
-                      {selectedFiles.length} photo(s) selected:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedFiles.map((file, idx) => (
-                        <div key={idx} className="relative group">
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={`Preview ${idx + 1}`}
-                            className="w-16 h-16 object-cover rounded border-2 border-gold/30"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedFiles(selectedFiles.filter((_, i) => i !== idx));
-                            }}
-                            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="w-full bg-primary hover:bg-primary/80 transition-all duration-300 text-white font-semibold py-3">
+                  WRITE A TRIBUTE
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20 data-[state=open]:pb-32 data-[state=open]:sm:pb-0">
+                <DialogHeader>
+                  <DialogTitle className="text-gold">
+                    SHARE YOUR TRIBUTE
+                  </DialogTitle>
+                  <DialogDescription className="text-gray-300">
+                    Share your memories, thoughts, or a message for{" "}
+                    {siteSettings?.deceased_name || "your loved one"}.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      placeholder="Your Name (Optional)"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
+                    />
+                    <Input
+                      placeholder="Your Relationship (e.g., Friend, Colleague) *"
+                      value={formData.relationship}
+                      onChange={(e) =>
+                        setFormData({ ...formData, relationship: e.target.value })
+                      }
+                      required
+                      className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
+                    />
                   </div>
-                )}
-              </div>
-              <ReactQuill
-                theme="snow"
-                value={formData.message}
-                onChange={(content) =>
-                  setFormData({ ...formData, message: content })
-                }
-                placeholder="Share your memories, thoughts, or a message for BK..."
-                modules={{
-                  toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ["bold", "italic", "underline", "strike", "blockquote"],
-                    [
-                      { list: "ordered" },
-                      { list: "bullet" },
-                      { indent: "-1" },
-                      { indent: "+1" },
-                    ],
-                    ["link"],
-                    ["clean"],
-                  ],
-                }}
-                className="bg-black/50 text-white"
-              />
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-purple-medium hover:bg-primary transition-all duration-300 text-white font-semibold py-3"
-              >
-                {isSubmitting ? "Submitting..." : "SHARE TRIBUTE"}
-              </Button>
-            </form>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-2">
+                      Attach Photos (Optional - Max 5)
+                    </label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        if (files.length > 5) {
+                          toast.error("You can only upload up to 5 photos");
+                          return;
+                        }
+                        setSelectedFiles(files);
+                      }}
+                      className="bg-black/50 border-gold/30 text-white file:bg-gold/20 file:text-gold file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-gold/30"
+                    />
+                    {selectedFiles.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-xs text-gray-400 mb-2">
+                          {selectedFiles.length} photo(s) selected:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedFiles.map((file, idx) => (
+                            <div key={idx} className="relative group">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Preview ${idx + 1}`}
+                                className="w-16 h-16 object-cover rounded border-2 border-gold/30"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedFiles(selectedFiles.filter((_, i) => i !== idx));
+                                }}
+                                className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <ReactQuill
+                    theme="snow"
+                    value={formData.message}
+                    onChange={(content) =>
+                      setFormData({ ...formData, message: content })
+                    }
+                    placeholder="Share your memories, thoughts, or a message for BK..."
+                    modules={{
+                      toolbar: [
+                        [{ header: [1, 2, false] }],
+                        ["bold", "italic", "underline", "strike", "blockquote"],
+                        [
+                          { list: "ordered" },
+                          { list: "bullet" },
+                          { indent: "-1" },
+                          { indent: "+1" },
+                        ],
+                        ["link"],
+                        ["clean"],
+                      ],
+                    }}
+                    className="bg-black/50 text-white"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-purple-medium hover:bg-primary transition-all duration-300 text-white font-semibold py-3"
+                  >
+                    {isSubmitting ? "Submitting..." : "SHARE TRIBUTE"}
+                  </Button>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Tributes List */}

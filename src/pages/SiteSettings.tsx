@@ -28,7 +28,6 @@ interface SiteSettings {
   profile_photo_url: string;
   background_photo_url: string;
   roles_titles: string;
-  life_summary: string;
   memorial_event_1_title: string;
   memorial_event_1_date: string;
   memorial_event_1_location: string;
@@ -53,7 +52,6 @@ const SiteSettings = () => {
     profile_photo_url: "",
     background_photo_url: "",
     roles_titles: "",
-    life_summary: "",
     memorial_event_1_title: "",
     memorial_event_1_date: "",
     memorial_event_1_location: "",
@@ -298,16 +296,7 @@ const SiteSettings = () => {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="life_summary">Life Summary</Label>
-                  <Textarea
-                    id="life_summary"
-                    value={settings.life_summary}
-                    onChange={(e) => handleChange("life_summary", e.target.value)}
-                    rows={4}
-                    className="bg-black/50 border-gold/30 text-white"
-                  />
-                </div>
+
               </CardContent>
             </Card>
 
