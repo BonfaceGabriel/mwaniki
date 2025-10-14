@@ -15,12 +15,12 @@ const BackgroundImage = ({ opacity = 0.2 }: BackgroundImageProps) => {
       .then((data) => {
         setBackgroundUrl(
           data.background_photo_url ||
-            "/lovable-uploads/placeholder-background.jpg"
+            ""
         );
       })
       .catch((error) => {
         console.error("Error fetching background:", error);
-        setBackgroundUrl("/lovable-uploads/placeholder-background.jpg");
+        setBackgroundUrl("");
       });
   }, []);
 

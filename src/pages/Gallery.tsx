@@ -39,6 +39,10 @@ interface Photo {
   caption: string;
 }
 
+interface SiteSettings {
+  deceased_name: string;
+}
+
 const withFullSrc = <T extends { src: string }>(p: T): T => ({
   ...p,
   src: p.src.startsWith("http")
@@ -58,18 +62,7 @@ const Gallery = () => {
   const [uploading, setUploading] = useState(false);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<number[]>([]);
-  const [loadedPhotoIds, setLoadedPhotoIds] = useState<Set<number>>(new Set());
-
-  const handleImageLoad = (photoId: number) => {
-    setLoadedPhotoIds((prev) => new Set(prev).add(photoId));
-  };
-
-  const handleImageError = (photoId: number) => {
-    console.warn(`Failed to load image with ID: ${photoId}`);
-    // Optionally, you could remove the photo from the main 'photos' state here
-    // if you want to permanently hide it after a load error.
-    // For now, we just won't add it to loadedPhotoIds, so it won't render.
-  };
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -191,6 +184,13 @@ const Gallery = () => {
         console.error("Error fetching photos:", error);
         setLoading(false);
       });
+
+    fetch(`${API_BASE_URL}/site-settings`)
+      .then((response) => response.json())
+      .then((data) => {
+        setSiteSettings(data);
+      })
+      .catch((error) => console.error("Error fetching site settings:", error));
   }, []);
 
   const nextImage = () => {
@@ -219,7 +219,8 @@ const Gallery = () => {
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6"></div>
             <p className="text-lg text-gray-300">
-              A COLLECTION OF PRECIOUS MOMENTS WITH BERNARD "BK" KASEMA
+              A COLLECTION OF PRECIOUS MOMENTS WITH{" "}
+              {siteSettings?.deceased_name?.toUpperCase() || "..."}
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
@@ -253,7 +254,8 @@ const Gallery = () => {
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6"></div>
             <p className="text-lg text-gray-300">
-              A COLLECTION OF PRECIOUS MOMENTS WITH BERNARD "BK" KASEMA
+              A COLLECTION OF PRECIOUS MOMENTS WITH{" "}
+              {siteSettings?.deceased_name?.toUpperCase() || "YOUR LOVED ONE"}
             </p>
           </div>
 
