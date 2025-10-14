@@ -4,6 +4,9 @@ const { Pool } = require("pg");
 const { v4: uuidv4 } = require("uuid");
 const { execSync } = require("child_process");
 
+// Load environment variables before creating pool
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {

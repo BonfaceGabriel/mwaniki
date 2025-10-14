@@ -9,7 +9,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import DraggableButton from "./DraggableButton";
 import useAuth from "@/hooks/use-auth";
@@ -26,7 +26,20 @@ const Navigation = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const { isAdmin, logout } = useAuth();
+
+  // Track scroll progress
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(Math.min(progress, 100));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems: NavItem[] = [
     {
@@ -89,71 +102,51 @@ const Navigation = () => {
   navItems.push(adminAuthItem);
 
   return (
-    <nav className="absolute top-0 left-0 right-0 z-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-end h-14 md:h-16">
-          {/* Mobile Dropdown Menu */}
-          {isMobile ? (
-            <DraggableButton>
-              <div className="relative">
-                <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-black/80 backdrop-blur-sm text-gold border border-gold/30 hover:bg-black/90 transition-all duration-200 font-tt-chocolates"
-                >
-                  <span className="text-sm">Menu</span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      {/* Mobile Horizontal Scrollable Navigation */}
+      {isMobile ? (
+        <div className="bg-black/40 backdrop-blur-sm">
+          {/* Progress Bar */}
+          <div className="h-0.5 bg-transparent">
+            <div
+              className="h-full bg-gradient-to-r from-gold via-yellow-500 to-gold transition-all duration-300"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
 
-                {isMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 bg-black/95 backdrop-blur-md border border-gold/30 rounded-lg shadow-2xl shadow-gold/20 overflow-hidden z-50">
-                    {navItems.map(
-                      ({ path, label, icon: Icon, description, onClick }) =>
-                        onClick ? (
-                          <button
-                            key={path}
-                            onClick={() => {
-                              onClick();
-                              setIsMenuOpen(false);
-                            }}
-                            className={`flex items-start space-x-3 px-4 py-3 transition-all duration-200 border-b border-gold/10 last:border-b-0 text-gray-300 hover:text-gold hover:bg-gold/10 w-full`}
-                          >
-                            <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <div className="font-medium text-sm">{label}</div>
-                              <div className="text-xs text-gray-400">
-                                {description}
-                              </div>
-                            </div>
-                          </button>
-                        ) : (
-                          <Link
-                            key={path}
-                            to={path}
-                            onClick={() => setIsMenuOpen(false)}
-                            className={`flex items-start space-x-3 px-4 py-3 transition-all duration-200 border-b border-gold/10 last:border-b-0 ${
-                              location.pathname === path
-                                ? "bg-gold/20 text-gold"
-                                : "text-gray-300 hover:text-gold hover:bg-gold/10"
-                            }`}
-                          >
-                            <Icon className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                            <div>
-                              <div className="font-medium text-sm">{label}</div>
-                              <div className="text-xs text-gray-400">
-                                {description}
-                              </div>
-                            </div>
-                          </Link>
-                        ),
-                    )}
-                  </div>
-                )}
-              </div>
-            </DraggableButton>
-          ) : (
-            /* Desktop Navigation */
+          {/* Scrollable Navigation Bar */}
+          <div className="overflow-x-auto scrollbar-hide">
+            <div className="flex px-3 py-1.5 space-x-1 min-w-max">
+              {navItems.map(({ path, label, onClick }) =>
+                onClick ? (
+                  <button
+                    key={path}
+                    onClick={onClick}
+                    className="px-3 py-1 text-xs transition-all duration-200 text-gray-400 hover:text-gold font-tt-chocolates whitespace-nowrap"
+                  >
+                    {label}
+                  </button>
+                ) : (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`px-3 py-1 text-xs transition-all duration-200 font-tt-chocolates whitespace-nowrap ${
+                      location.pathname === path
+                        ? "text-gold"
+                        : "text-gray-400 hover:text-gold"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                ),
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Desktop Navigation */
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center justify-end h-14 md:h-16">
             <div className="flex space-x-2">
               {navItems.map(({ path, label, icon: Icon, onClick }) =>
                 onClick ? (
@@ -181,9 +174,9 @@ const Navigation = () => {
                 ),
               )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

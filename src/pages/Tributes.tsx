@@ -33,7 +33,7 @@ interface Tribute {
   message: string;
   timestamp: string;
   type: string;
-  photo_url?: string;
+  photos?: string[];
 }
 
 const Tributes = () => {
@@ -46,7 +46,7 @@ const Tributes = () => {
     message: "",
     type: "tribute",
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
   const { isAdmin } = useAuth();
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -134,9 +134,10 @@ const Tributes = () => {
       submitData.append("message", formData.message);
       submitData.append("type", formData.type);
 
-      if (selectedFile) {
-        submitData.append("photo", selectedFile);
-      }
+      // Append multiple photos
+      selectedFiles.forEach((file) => {
+        submitData.append("photos", file);
+      });
 
       const response = await fetch(`${API_BASE_URL}/tributes`, {
         method: "POST",
@@ -150,7 +151,7 @@ const Tributes = () => {
           message: "",
           type: "tribute",
         });
-        setSelectedFile(null);
+        setSelectedFiles([]);
         fetchTributes();
         toast.success("Thank you for sharing your tribute!");
       } else {
@@ -293,18 +294,48 @@ const Tributes = () => {
               </div>
               <div>
                 <label className="block text-sm text-gray-300 mb-2">
-                  Attach a Photo (Optional)
+                  Attach Photos (Optional - Max 5)
                 </label>
                 <Input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length > 5) {
+                      toast.error("You can only upload up to 5 photos");
+                      return;
+                    }
+                    setSelectedFiles(files);
+                  }}
                   className="bg-black/50 border-gold/30 text-white file:bg-gold/20 file:text-gold file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-gold/30"
                 />
-                {selectedFile && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    Selected: {selectedFile.name}
-                  </p>
+                {selectedFiles.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-400 mb-2">
+                      {selectedFiles.length} photo(s) selected:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedFiles.map((file, idx) => (
+                        <div key={idx} className="relative group">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={`Preview ${idx + 1}`}
+                            className="w-16 h-16 object-cover rounded border-2 border-gold/30"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFiles(selectedFiles.filter((_, i) => i !== idx));
+                            }}
+                            className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
               <ReactQuill
@@ -409,36 +440,39 @@ const Tributes = () => {
                     className="text-gray-200 mb-4 leading-relaxed text-lg"
                     dangerouslySetInnerHTML={{ __html: tribute.message }}
                   />
-                  <div className="flex justify-between items-end">
-                    <div className="flex items-center gap-3">
-                      {tribute.photo_url && (
+                  {tribute.photos && tribute.photos.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {tribute.photos.map((photoUrl, photoIdx) => (
                         <div
+                          key={photoIdx}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedPhotoUrl(tribute.photo_url!);
+                            setSelectedPhotoUrl(photoUrl);
                           }}
                           className="cursor-pointer group relative flex-shrink-0"
                         >
                           <img
-                            src={tribute.photo_url}
-                            alt="Tribute photo"
-                            className="w-16 h-16 object-cover rounded-lg border-2 border-gold/30 group-hover:border-gold transition-all duration-200 group-hover:scale-105"
+                            src={photoUrl}
+                            alt={`Tribute photo ${photoIdx + 1}`}
+                            className="w-20 h-20 object-cover rounded-lg border-2 border-gold/30 group-hover:border-gold transition-all duration-200 group-hover:scale-105"
                           />
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
                             <span className="text-white text-xs">View</span>
                           </div>
                         </div>
-                      )}
-                      <div>
-                        <p className="font-bold text-gold text-lg">
-                          {tribute.name || tribute.relationship}
+                      ))}
+                    </div>
+                  )}
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="font-bold text-gold text-lg">
+                        {tribute.name || tribute.relationship}
+                      </p>
+                      {tribute.name && (
+                        <p className="text-sm text-gray-400">
+                          {tribute.relationship}
                         </p>
-                        {tribute.name && (
-                          <p className="text-sm text-gray-400">
-                            {tribute.relationship}
-                          </p>
-                        )}
-                      </div>
+                      )}
                     </div>
                     <p className="text-xs text-gray-500">
                       {formatDate(tribute.timestamp)}

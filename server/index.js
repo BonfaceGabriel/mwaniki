@@ -96,15 +96,26 @@ app.get("/tributes", async (_req, res) => {
   }
 
   try {
-    const { rows } = await pool.query(
+    // Fetch tributes
+    const { rows: tributes } = await pool.query(
       "SELECT * FROM tributes ORDER BY timestamp DESC",
     );
+
+    // Fetch photos for each tribute
+    for (const tribute of tributes) {
+      const { rows: photos } = await pool.query(
+        "SELECT photo_url FROM tribute_photos WHERE tribute_id = $1 ORDER BY created_at ASC",
+        [tribute.id]
+      );
+      tribute.photos = photos.map(p => p.photo_url);
+    }
+
     cache[cacheKey] = {
       timestamp: now,
-      data: rows,
+      data: tributes,
     };
     console.log("Serving tributes from DB and caching");
-    res.json(rows);
+    res.json(tributes);
   } catch (err) {
     console.error("Error fetching tributes:", err);
     res.status(500).json({ error: "Failed to fetch tributes." });
@@ -113,43 +124,49 @@ app.get("/tributes", async (_req, res) => {
 
 app.post(
   "/tributes",
-  upload.single("photo"),
+  upload.array("photos", 5), // Allow up to 5 photos
   clearCache("tributes"),
   async (req, res) => {
     const { name, relationship, message, type } = req.body;
     const sanitizedMessage = DOMPurify.sanitize(message);
     const id = uuidv4();
-    let photoUrl = null;
 
     try {
-      // Handle optional photo upload
-      if (req.file) {
-        const file = req.file;
-        const filename = `tribute-${id}${path.extname(file.originalname)}`;
+      // Insert tribute first
+      const { rows } = await pool.query(
+        "INSERT INTO tributes (id, name, relationship, message, type) VALUES ($1,$2,$3,$4,$5) RETURNING *",
+        [id, name, relationship, sanitizedMessage, type],
+      );
 
-        // Upload to Supabase Storage
-        const { error: uploadErr } = await supabase.storage
-          .from(BUCKET)
-          .upload(filename, file.buffer, {
-            contentType: file.mimetype,
-            upsert: true,
-          });
+      // Handle multiple photo uploads
+      const files = Array.isArray(req.files) ? req.files : [];
+      if (files.length > 0) {
+        for (const file of files) {
+          const filename = `tribute-${id}-${uuidv4()}${path.extname(file.originalname)}`;
 
-        if (uploadErr) throw uploadErr;
+          // Upload to Supabase Storage
+          const { error: uploadErr } = await supabase.storage
+            .from(BUCKET)
+            .upload(filename, file.buffer, {
+              contentType: file.mimetype,
+              upsert: true,
+            });
 
-        // Get public URL
-        const { data: pub } = supabase.storage
-          .from(BUCKET)
-          .getPublicUrl(filename);
+          if (uploadErr) throw uploadErr;
 
-        photoUrl = pub.publicUrl;
+          // Get public URL
+          const { data: pub } = supabase.storage
+            .from(BUCKET)
+            .getPublicUrl(filename);
+
+          // Insert into tribute_photos table
+          await pool.query(
+            "INSERT INTO tribute_photos (tribute_id, photo_url) VALUES ($1, $2)",
+            [id, pub.publicUrl]
+          );
+        }
       }
 
-      // Insert tribute with optional photo_url
-      const { rows } = await pool.query(
-        "INSERT INTO tributes (id, name, relationship, message, type, photo_url) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
-        [id, name, relationship, sanitizedMessage, type, photoUrl],
-      );
       res.status(201).json(rows[0]);
     } catch (err) {
       console.error("Error posting tribute:", err);

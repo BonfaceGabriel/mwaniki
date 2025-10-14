@@ -242,7 +242,7 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/80"></div>
 
           {/* Content wrapper — extra top-padding on md+ so it clears the fixed navbar */}
-          <div className="relative z-20 mx-auto max-w-6xl px-4 flex flex-col items-center justify-center pt-12 pb-12 md:pt-36 md:pb-24 lg:pt-40">
+          <div className="relative z-20 mx-auto max-w-6xl px-4 flex flex-col items-center justify-center pt-20 pb-12 md:pt-36 md:pb-24 lg:pt-40">
             {/* Years & portrait */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-16 mb-8">
               {/* Birth Year */}
@@ -333,13 +333,12 @@ const Index = () => {
         </section>
 
         {/* Life Story Preview Section with fade overlay */}
-        <section className="relative py-16 md:py-24">
-          <div className="absolute inset-0 fade-overlay"></div>
+        <section className="relative py-8 md:py-12">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
           <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
             <h2 className="text-3xl md:text-4xl text-gold mb-6 subtle-glow">
               LIFE STORY
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-8"></div>
             <p className="text-gray-200 leading-relaxed text-lg md:text-xl mb-8 max-w-3xl mx-auto">
               {eulogyPreview ||
                 siteSettings?.life_summary ||
@@ -356,34 +355,41 @@ const Index = () => {
         </section>
 
         {/* Cherished Memories Section */}
-        <section className="relative py-16 md:py-24">
-          <div className="absolute inset-0 bg-black/70"></div>
+        <section className="relative py-8 md:py-12">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
           <div className="relative z-10 max-w-6xl mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl text-gold mb-6 text-center subtle-glow">
+            <h2 className="text-3xl md:text-4xl text-gold mb-8 text-center subtle-glow">
               CHERISHED MEMORIES
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-12"></div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
               {previewImages.map((image, index) => (
                 <div
                   key={image.id}
-                  className="relative overflow-hidden rounded-lg bg-purple-dark/30 border border-gold/20 hover:border-gold/60 transition-all duration-300 cursor-pointer group hover:scale-105 aspect-square animate-fade-in-up"
+                  className="relative overflow-hidden rounded-xl bg-black/30 border border-gold/10 hover:border-gold/40 transition-all duration-500 cursor-pointer group shadow-lg hover:shadow-2xl hover:shadow-gold/20 animate-fade-in-up"
                   onClick={() => setSelectedImage(index)}
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  style={{
+                    animationDelay: `${index * 100}ms`,
+                    aspectRatio: '4/3'
+                  }}
                 >
                   <img
                     src={image.src}
                     alt={image.alt}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   {image.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 p-3 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {image.caption}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                      <p className="font-medium text-gold">{image.caption}</p>
                     </div>
                   )}
+                  <div className="absolute top-2 right-2 w-8 h-8 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg className="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m0 0v6m0-6h6m-6 0H4" />
+                    </svg>
+                  </div>
                 </div>
               ))}
             </div>
@@ -401,13 +407,12 @@ const Index = () => {
         </section>
 
         {/* Tributes Section */}
-        <section className="relative py-16 md:py-24">
-          <div className="absolute inset-0 bg-black/80"></div>
+        <section className="relative py-8 md:py-12">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
           <div className="relative z-10 max-w-6xl mx-auto px-4">
-            <h2 className="text-3xl md:text-4xl text-center text-gold mb-6 subtle-glow">
+            <h2 className="text-3xl md:text-4xl text-center text-gold mb-8 subtle-glow">
               WORDS OF REMEMBRANCE
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-12"></div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {recentTributes.map((tribute, index) => (
@@ -447,14 +452,13 @@ const Index = () => {
         </section>
 
         {/* Memorial Information Section */}
-        <section className="relative py-16 md:py-24">
-          <div className="absolute inset-0 bg-black/90"></div>
+        <section className="relative py-8 md:py-12 pb-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80"></div>
           <div className="relative z-10 max-w-4xl mx-auto px-4">
             <div className="bg-purple-dark/50 backdrop-blur-sm border border-gold/30 rounded-2xl p-8 md:p-12 text-center">
-              <h2 className="text-3xl md:text-4xl text-gold mb-6 subtle-glow">
+              <h2 className="text-3xl md:text-4xl text-gold mb-8 subtle-glow">
                 MEMORIAL INFORMATION
               </h2>
-              <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-8"></div>
 
               <p className="text-gray-200 leading-relaxed text-lg md:text-xl mb-8">
                 Find details for the upcoming memorial service, viewing times,

@@ -359,15 +359,15 @@ const Gallery = () => {
               )}
             </div>
 
-            {/* Uniform grid layout */}
-            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {/* Elegant masonry-style grid layout */}
+            <div className="mt-8 columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 space-y-3">
               {photos.map((photo, index) => (
                 <div
                   key={photo.id}
-                  className={`relative overflow-hidden rounded-lg bg-purple-dark/30 border border-gold/20 transition-all duration-200 cursor-pointer group hover:scale-105 aspect-square animate-fade-in ${
+                  className={`relative overflow-hidden rounded-xl bg-black/30 border border-gold/10 transition-all duration-500 cursor-pointer group shadow-lg hover:shadow-2xl hover:shadow-gold/20 break-inside-avoid mb-3 animate-fade-in ${
                     isSelectionMode
                       ? "hover:border-blue-400"
-                      : "hover:border-gold/60"
+                      : "hover:border-gold/40"
                   } ${
                     selectedPhotos.includes(photo.id)
                       ? "ring-4 ring-blue-500 ring-offset-2 ring-offset-black"
@@ -379,19 +379,19 @@ const Gallery = () => {
                       : setSelectedImage(index)
                   }
                   style={{
-                    animationDelay: `${index * 50}ms`,
+                    animationDelay: `${index * 30}ms`,
                   }}
                 >
                   <img
                     src={photo.src}
                     alt={photo.alt}
-                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                    className="w-full h-auto object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-110"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   {photo.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 p-3 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      {photo.caption}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white text-sm opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                      <p className="font-medium text-gold">{photo.caption}</p>
                     </div>
                   )}
                   {isSelectionMode && (
