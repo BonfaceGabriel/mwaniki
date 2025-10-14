@@ -186,7 +186,8 @@ const Tributes = () => {
     } catch (error) {
       console.error("Error submitting tribute:", error);
       toast.error("Failed to submit tribute. Please try again.");
-    } finally {
+    }
+    finally {
       setIsSubmitting(false);
     }
   };
@@ -303,7 +304,7 @@ const Tributes = () => {
                   WRITE A TRIBUTE
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[625px] max-h-[90vh] overflow-y-auto bg-purple-dark/95 border border-gold/30 text-white shadow-lg shadow-gold/20">
+              <DialogContent className="sm:max-w-[625px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20 data-[state=open]:pb-32 data-[state=open]:sm:pb-0">
                 <DialogHeader>
                   <DialogTitle className="text-gold">
                     SHARE YOUR TRIBUTE
@@ -314,36 +315,24 @@ const Tributes = () => {
                   </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="tribute-name" className="text-gold text-sm font-semibold">
-                        Your Name (Optional)
-                      </Label>
-                      <Input
-                        id="tribute-name"
-                        placeholder="Enter your full name"
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        className="bg-black/50 border-gold/30 text-white placeholder:text-gray-500 focus:border-gold"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="tribute-relationship" className="text-gold text-sm font-semibold">
-                        Your Relationship *
-                      </Label>
-                      <Input
-                        id="tribute-relationship"
-                        placeholder="e.g., Friend, Colleague, Family Member"
-                        value={formData.relationship}
-                        onChange={(e) =>
-                          setFormData({ ...formData, relationship: e.target.value })
-                        }
-                        required
-                        className="bg-black/50 border-gold/30 text-white placeholder:text-gray-500 focus:border-gold"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Input
+                      placeholder="Your Name (Optional)"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
+                    />
+                    <Input
+                      placeholder="Your Relationship (e.g., Friend, Colleague) *"
+                      value={formData.relationship}
+                      onChange={(e) =>
+                        setFormData({ ...formData, relationship: e.target.value })
+                      }
+                      required
+                      className="bg-black/50 border-gold/30 text-white placeholder:text-gray-400 focus:border-gold"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm text-gray-300 mb-2">
@@ -443,11 +432,7 @@ const Tributes = () => {
                 <div
                   id={`tribute-${tribute.id}`}
                   key={tribute.id}
-                  className={`relative bg-purple-dark/50 backdrop-blur-sm border border-gold/20 rounded-lg p-6 transition-all duration-300 shadow-lg ${isSelectionMode ? "hover:border-blue-400" : "hover:border-gold/40"} ${selectedTributes.includes(tribute.id) ? "ring-4 ring-blue-500 ring-offset-2 ring-offset-black" : ""}`}
-                  onClick={() =>
-                    isSelectionMode && handleSelectTribute(tribute.id)
-                  }
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  className={`relative bg-purple-dark/50 backdrop-blur-sm border border-gold/20 rounded-lg p-6 transition-all duration-300 shadow-lg group ${isSelectionMode ? "hover:border-blue-400" : "hover:border-gold/40"} ${selectedTributes.includes(tribute.id) ? "ring-4 ring-blue-500 ring-offset-2 ring-offset-black" : ""}`}
                 >
                   {isAdmin && isSelectionMode && (
                     <div className="absolute top-2 right-2">
@@ -464,7 +449,7 @@ const Tributes = () => {
                       <AlertDialogTrigger asChild>
                         <button
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 transition-opacity duration-200"
+                          className="absolute top-3 right-3 bg-red-600/80 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -translate-y-1/2"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -568,3 +553,4 @@ const Tributes = () => {
 };
 
 export default Tributes;
+

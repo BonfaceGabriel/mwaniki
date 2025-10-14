@@ -333,7 +333,7 @@ const Gallery = () => {
                 <DialogTrigger asChild>
                   <Button className="btn-primary">Upload Photos</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto bg-purple-dark/95 border border-gold/30 text-white shadow-lg shadow-gold/20">
+                <DialogContent className="sm:max-w-[425px] bg-purple-dark/90 border border-gold/30 text-white shadow-lg shadow-gold/20 data-[state=open]:pb-32 data-[state=open]:sm:pb-0">
                   <DialogHeader>
                     <DialogTitle className="text-gold text-xl">
                       UPLOAD PHOTOS
@@ -343,81 +343,67 @@ const Gallery = () => {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-gold text-sm font-semibold">
-                        Your Name
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="name" className="text-right">
+                        YOUR NAME
                       </Label>
                       <Input
                         id="name"
                         value={uploaderName}
                         onChange={(e) => setUploaderName(e.target.value)}
-                        placeholder="Enter your full name (optional)"
-                        className="w-full bg-black/50 border-gold/30 text-white placeholder:text-gray-500"
+                        className="col-span-3"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gold text-sm font-semibold">
-                        Your Email
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="email" className="text-right">
+                        YOUR EMAIL
                       </Label>
                       <Input
                         id="email"
                         type="email"
                         value={uploaderEmail}
                         onChange={(e) => setUploaderEmail(e.target.value)}
-                        placeholder="Enter your email address (optional)"
-                        className="w-full bg-black/50 border-gold/30 text-white placeholder:text-gray-500"
+                        className="col-span-3"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="caption" className="text-gold text-sm font-semibold">
-                        Caption
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="caption" className="text-right">
+                        CAPTION
                       </Label>
                       <Input
                         id="caption"
                         value={caption}
                         onChange={(e) => setCaption(e.target.value)}
-                        placeholder="Add a caption to your photos (optional)"
-                        className="w-full bg-black/50 border-gold/30 text-white placeholder:text-gray-500"
+                        className="col-span-3"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="picture" className="text-gold text-sm font-semibold">
-                        Select Photos
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="picture" className="text-right">
+                        PICTURES
                       </Label>
                       <Input
                         id="picture"
                         type="file"
                         multiple
-                        accept="image/*"
                         onChange={handleFileChange}
-                        className="w-full bg-black/50 border-gold/30 text-white file:bg-gold/20 file:text-gold file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 hover:file:bg-gold/30"
+                        className="col-span-3"
                       />
                     </div>
                     {selectedFiles.length > 0 && (
-                      <div className="bg-black/30 p-3 rounded-lg border border-gold/20">
-                        <p className="text-sm text-gold mb-2">
-                          {selectedFiles.length} photo{selectedFiles.length > 1 ? 's' : ''} selected
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedFiles.map((file, idx) => (
-                            <div key={idx} className="text-xs text-gray-400 bg-black/40 px-2 py-1 rounded">
-                              {file.name}
-                            </div>
-                          ))}
-                        </div>
+                      <div className="text-sm text-right text-gray-500 col-span-4">
+                        {selectedFiles.length} file(s) selected
                       </div>
                     )}
                   </div>
-                  <DialogFooter className="flex-col sm:flex-row gap-2">
+                  <DialogFooter>
                     <Button
                       type="submit"
                       onClick={handleUpload}
                       disabled={selectedFiles.length === 0 || uploading}
-                      className="w-full sm:w-auto bg-gold hover:bg-gold/80 text-black font-semibold"
                     >
                       {uploading
                         ? "Uploading..."
-                        : `Upload ${selectedFiles.length} Photo${selectedFiles.length > 1 ? 's' : ''}`}
+                        : `Upload ${selectedFiles.length} Photo(s)`}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -453,8 +439,7 @@ const Gallery = () => {
                     selectedPhotos.includes(photo.id)
                       ? "ring-4 ring-blue-500 ring-offset-2 ring-offset-black"
                       : ""
-                  }`}
-                  onClick={() =>
+                  }`}                  onClick={() =>
                     isSelectionMode
                       ? handleSelectPhoto(photo.id)
                       : setSelectedImage(index)
@@ -490,7 +475,7 @@ const Gallery = () => {
                       <AlertDialogTrigger asChild>
                         <button
                           onClick={(e) => e.stopPropagation()}
-                          className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 transition-opacity duration-200"
+                          className="absolute top-3 right-3 bg-red-600/80 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -translate-y-1/2"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
