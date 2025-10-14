@@ -122,6 +122,7 @@ const SiteSettings = () => {
       }
 
       toast.success("Settings saved successfully!");
+      navigate("/");
     } catch (err) {
       console.error("Error saving settings:", err);
       toast.error("Failed to save settings");
