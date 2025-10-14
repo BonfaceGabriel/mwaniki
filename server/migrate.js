@@ -1,18 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-
-// Manually load .env.production
-const envPath = path.resolve(__dirname, "../.env.production");
-if (fs.existsSync(envPath)) {
-  const envConfig = fs.readFileSync(envPath, "utf8");
-  envConfig.split('\n').forEach(line => {
-    const [key, value] = line.split('=');
-    if (key && value) {
-      process.env[key.trim()] = value.trim();
-    }
-  });
-}
-
 const { Pool } = require("pg");
 const { v4: uuidv4 } = require("uuid");
 const { execSync } = require("child_process");
@@ -121,15 +108,13 @@ async function migrateData() {
         const filePath = path.join(migrationsDir, file);
         try {
           console.log(`Executing migration: ${file}...`);
-          // Pass the env file path to the child process
-          execSync(`node -r dotenv/config ${filePath}`, {
+          execSync(`node ${filePath}`, {
             stdio: "inherit",
-            env: { ...process.env, DOTENV_CONFIG_PATH: envPath },
+            env: process.env,
            });
           console.log(`Migration ${file} executed successfully.`);
         } catch (error) {
           console.error(`Failed to execute migration ${file}:`, error);
-          // Decide if you want to stop all migrations on failure
           throw new Error(`Migration ${file} failed.`);
         }
       }
@@ -138,6 +123,7 @@ async function migrateData() {
     console.log("Data migration complete.");
   } catch (error) {
     console.error("Error during data migration:", error);
+    process.exit(1);
   } finally {
     client.release();
     await pool.end();
