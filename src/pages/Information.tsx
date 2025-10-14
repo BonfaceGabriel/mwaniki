@@ -1,7 +1,19 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import BackgroundImage from "@/components/BackgroundImage";
-import { Calendar, Clock, MapPin, Users, Heart, Edit, Trash2, Plus, Loader2, Save, X } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Heart,
+  Edit,
+  Trash2,
+  Plus,
+  Loader2,
+  Save,
+  X,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
 import useAuth from "@/hooks/use-auth";
@@ -24,7 +36,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 interface Update {
   id: number;
@@ -56,7 +69,8 @@ interface SiteSettings {
 
 const Information = () => {
   const { isAdmin, token } = useAuth();
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Update | null>(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] =
+    useState<Update | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,9 +122,10 @@ const Information = () => {
   const handleAddEvent = () => {
     setEditingEvent(null);
     // Use the next available order number
-    const nextOrder = updates.length > 0
-      ? Math.max(...updates.map(u => u.display_order || 0)) + 1
-      : 1;
+    const nextOrder =
+      updates.length > 0
+        ? Math.max(...updates.map((u) => u.display_order || 0)) + 1
+        : 1;
     setFormData({
       title: "",
       date: "",
@@ -162,7 +177,11 @@ const Information = () => {
 
       if (!response.ok) throw new Error("Failed to save event");
 
-      toast.success(editingEvent ? "Event updated successfully!" : "Event created successfully!");
+      toast.success(
+        editingEvent
+          ? "Event updated successfully!"
+          : "Event created successfully!"
+      );
       setIsEditDialogOpen(false);
       fetchEvents();
     } catch (error) {
@@ -210,7 +229,7 @@ const Information = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white relative">
-        <BackgroundImage opacity={0.3} />
+        <BackgroundImage />
         <Navigation />
         <div className="relative z-10 flex items-center justify-center min-h-[50vh]">
           <Loader2 className="w-8 h-8 animate-spin text-gold" />
@@ -223,7 +242,7 @@ const Information = () => {
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Background with seamless scroll */}
-      <BackgroundImage opacity={0.3} />
+      <BackgroundImage />
 
       <Navigation />
 
@@ -235,43 +254,25 @@ const Information = () => {
             </h1>
             <div className="w-32 h-px bg-gradient-to-r from-transparent via-gold to-transparent mx-auto mb-6"></div>
             <p className="text-lg text-gray-300">
-              A SCHEDULE OF EVENTS TO HONOR AND CELEBRATE THE LIFE OF {siteSettings?.deceased_name?.toUpperCase() || "OUR LOVED ONE"}.
+              A SCHEDULE OF EVENTS TO HONOR AND CELEBRATE THE LIFE OF{" "}
+              {siteSettings?.deceased_name?.toUpperCase() || "OUR LOVED ONE"}.
             </p>
           </div>
 
           {/* Event Cards - show first two events from DB or fall back to site settings */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {updates.length >= 2 ? (
-              <>
-                <EventCard
-                  icon="church"
-                  title={updates[0].title.toUpperCase()}
-                  date={updates[0].date}
-                  location={updates[0].venue}
-                />
-                <EventCard
-                  icon="cross"
-                  title={updates[1].title.toUpperCase()}
-                  date={updates[1].date}
-                  location={updates[1].venue}
-                />
-              </>
-            ) : (
-              <>
-                <EventCard
-                  icon="church"
-                  title={siteSettings?.memorial_event_1_title?.toUpperCase() || "MEMORIAL SERVICE"}
-                  date={siteSettings?.memorial_event_1_date || "Date TBD"}
-                  location={siteSettings?.memorial_event_1_location || "Location TBD"}
-                />
-                <EventCard
-                  icon="cross"
-                  title={siteSettings?.memorial_event_2_title?.toUpperCase() || "FUNERAL SERVICE"}
-                  date={siteSettings?.memorial_event_2_date || "Date TBD"}
-                  location={siteSettings?.memorial_event_2_location || "Location TBD"}
-                />
-              </>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <EventCard
+              icon="church"
+              title={siteSettings?.memorial_event_1_title || "Memorial Service"}
+              date={siteSettings?.memorial_event_1_date || "Date TBD"}
+              location={siteSettings?.memorial_event_1_location || "Location TBD"}
+            />
+            <EventCard
+              icon="cross"
+              title={siteSettings?.memorial_event_2_title || "Funeral Service"}
+              date={siteSettings?.memorial_event_2_date || "Date TBD"}
+              location={siteSettings?.memorial_event_2_location || "Location TBD"}
+            />
           </div>
 
           {isAdmin && (
@@ -290,7 +291,9 @@ const Information = () => {
             {updates.map((update) => (
               <article
                 key={update.id}
-                className={`border rounded-lg p-6 md:p-8 transition-all duration-300 hover:scale-[1.02] hover:border-gold/60 shadow-lg ${getTypeColor(update.type)} relative`}
+                className={`border rounded-lg p-6 md:p-8 transition-all duration-300 hover:scale-[1.02] hover:border-gold/60 shadow-lg ${getTypeColor(
+                  update.type
+                )} relative`}
               >
                 {isAdmin && (
                   <div className="absolute top-4 right-4 flex gap-2">
@@ -412,13 +415,19 @@ const Information = () => {
               {/* Paybill */}
               {siteSettings?.paybill_number && (
                 <div className="bg-black/50 border border-gold/20 rounded-lg p-4">
-                  <h4 className="text-gold font-semibold mb-2">M-Pesa Paybill</h4>
+                  <h4 className="text-gold font-semibold mb-2">
+                    M-Pesa Paybill
+                  </h4>
                   <p className="text-white">
-                    <span className="text-gray-400">Paybill Number:</span> <span className="text-gold font-mono">{siteSettings.paybill_number}</span>
+                    <span className="text-gray-400">Paybill Number:</span>{" "}
+                    <span className="text-gold font-mono">
+                      {siteSettings.paybill_number}
+                    </span>
                   </p>
                   {siteSettings.paybill_account_name && (
                     <p className="text-white">
-                      <span className="text-gray-400">Account:</span> {siteSettings.paybill_account_name}
+                      <span className="text-gray-400">Account:</span>{" "}
+                      {siteSettings.paybill_account_name}
                     </p>
                   )}
                   <p className="text-gray-400 text-sm mt-1">
@@ -430,9 +439,14 @@ const Information = () => {
               {/* M-Pesa Direct */}
               {siteSettings?.mpesa_phone_number && (
                 <div className="bg-black/50 border border-gold/20 rounded-lg p-4">
-                  <h4 className="text-gold font-semibold mb-2">M-Pesa Send Money</h4>
+                  <h4 className="text-gold font-semibold mb-2">
+                    M-Pesa Send Money
+                  </h4>
                   <p className="text-white">
-                    <span className="text-gray-400">Phone Number:</span> <span className="text-gold font-mono">{siteSettings.mpesa_phone_number}</span>
+                    <span className="text-gray-400">Phone Number:</span>{" "}
+                    <span className="text-gold font-mono">
+                      {siteSettings.mpesa_phone_number}
+                    </span>
                   </p>
                 </div>
               )}
@@ -440,18 +454,25 @@ const Information = () => {
               {/* Bank Account */}
               {siteSettings?.bank_account_number && (
                 <div className="bg-black/50 border border-gold/20 rounded-lg p-4">
-                  <h4 className="text-gold font-semibold mb-2">Bank Transfer</h4>
+                  <h4 className="text-gold font-semibold mb-2">
+                    Bank Transfer
+                  </h4>
                   {siteSettings.bank_name && (
                     <p className="text-white">
-                      <span className="text-gray-400">Bank:</span> {siteSettings.bank_name}
+                      <span className="text-gray-400">Bank:</span>{" "}
+                      {siteSettings.bank_name}
                     </p>
                   )}
                   <p className="text-white">
-                    <span className="text-gray-400">Account Number:</span> <span className="text-gold font-mono">{siteSettings.bank_account_number}</span>
+                    <span className="text-gray-400">Account Number:</span>{" "}
+                    <span className="text-gold font-mono">
+                      {siteSettings.bank_account_number}
+                    </span>
                   </p>
                   {siteSettings.bank_account_name && (
                     <p className="text-white">
-                      <span className="text-gray-400">Account Name:</span> {siteSettings.bank_account_name}
+                      <span className="text-gray-400">Account Name:</span>{" "}
+                      {siteSettings.bank_account_name}
                     </p>
                   )}
                 </div>

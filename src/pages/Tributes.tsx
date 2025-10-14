@@ -175,7 +175,7 @@ const Tributes = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white relative">
-        <BackgroundImage opacity={0.3} />
+        <BackgroundImage />
         <Navigation />
         <main className="max-w-4xl mx-auto px-4 py-12 pt-24">
           <div className="text-center mb-12">
@@ -230,7 +230,7 @@ const Tributes = () => {
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Background with seamless scroll */}
-      <BackgroundImage opacity={0.3} />
+      <BackgroundImage />
 
       <Navigation />
 

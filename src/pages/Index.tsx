@@ -61,16 +61,6 @@ interface SiteSettings {
   memorial_event_2_location: string;
 }
 
-interface InformationEvent {
-  id: number;
-  title: string;
-  date: string;
-  time: string;
-  venue: string;
-  content: string;
-  type: string;
-}
-
 const Index = () => {
   const { isAdmin, token } = useAuth();
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
@@ -78,7 +68,6 @@ const Index = () => {
   const [recentTributes, setRecentTributes] = useState<Tribute[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [eulogyPreview, setEulogyPreview] = useState<string>("");
-  const [infoEvents, setInfoEvents] = useState<InformationEvent[]>([]);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploadingProfile, setUploadingProfile] = useState(false);
@@ -99,13 +88,6 @@ const Index = () => {
         setRecentTributes(data.slice(0, 3));
       })
       .catch((error) => console.error("Error fetching tributes:", error));
-
-    fetch(`${API_BASE_URL}/information-events`)
-      .then((response) => response.json())
-      .then((data) => {
-        setInfoEvents(data.slice(0, 2));
-      })
-      .catch((error) => console.error("Error fetching events:", error));
 
     fetch(`${API_BASE_URL}/site-settings`)
       .then((response) => response.json())
@@ -481,49 +463,28 @@ const Index = () => {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-                {infoEvents.length >= 2 ? (
-                  <>
-                    <EventCard
-                      icon="church"
-                      title={infoEvents[0].title.toUpperCase()}
-                      date={infoEvents[0].date}
-                      location={infoEvents[0].venue}
-                    />
-                    <EventCard
-                      icon="cross"
-                      title={infoEvents[1].title.toUpperCase()}
-                      date={infoEvents[1].date}
-                      location={infoEvents[1].venue}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <EventCard
-                      icon="church"
-                      title={
-                        siteSettings?.memorial_event_1_title?.toUpperCase() ||
-                        "MEMORIAL SERVICE"
-                      }
-                      date={siteSettings?.memorial_event_1_date || "Date TBD"}
-                      location={
-                        siteSettings?.memorial_event_1_location ||
-                        "Location TBD"
-                      }
-                    />
-                    <EventCard
-                      icon="cross"
-                      title={
-                        siteSettings?.memorial_event_2_title?.toUpperCase() ||
-                        "FUNERAL SERVICE"
-                      }
-                      date={siteSettings?.memorial_event_2_date || "Date TBD"}
-                      location={
-                        siteSettings?.memorial_event_2_location ||
-                        "Location TBD"
-                      }
-                    />
-                  </>
-                )}
+                <EventCard
+                  icon="church"
+                  title={
+                    siteSettings?.memorial_event_1_title?.toUpperCase() ||
+                    "MEMORIAL SERVICE"
+                  }
+                  date={siteSettings?.memorial_event_1_date || "Date TBD"}
+                  location={
+                    siteSettings?.memorial_event_1_location || "Location TBD"
+                  }
+                />
+                <EventCard
+                  icon="cross"
+                  title={
+                    siteSettings?.memorial_event_2_title?.toUpperCase() ||
+                    "FUNERAL SERVICE"
+                  }
+                  date={siteSettings?.memorial_event_2_date || "Date TBD"}
+                  location={
+                    siteSettings?.memorial_event_2_location || "Location TBD"
+                  }
+                />
               </div>
 
               <Link

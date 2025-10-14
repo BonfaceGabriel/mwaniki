@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import BackgroundImage from "@/components/BackgroundImage";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -204,7 +205,7 @@ const SiteSettings = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative">
-      <div className="fixed inset-0 scroll-bg opacity-30 z-0"></div>
+      <BackgroundImage />
       <Navigation />
 
       <div className="relative z-10">

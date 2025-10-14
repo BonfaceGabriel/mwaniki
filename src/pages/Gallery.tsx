@@ -241,7 +241,7 @@ const Gallery = () => {
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Background with seamless scroll */}
-      <BackgroundImage opacity={0.3} />
+      <BackgroundImage />
 
       <Navigation />
 
