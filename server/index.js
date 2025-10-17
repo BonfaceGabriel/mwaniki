@@ -44,7 +44,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
-/* ───── Auth Middleware ───────────────────��────────────────────────── */
+/* ───── Auth Middleware ───────────────────────────────────────────── */
 const auth = expressjwt({
   secret: JWT_SECRET,
   algorithms: ["HS256"],
@@ -535,7 +535,7 @@ app.delete(
   },
 );
 
-/* ───────────────��─ Initialize DB & start server ───────────────────── */
+/* ──────────────── Initialize DB & start server ───────────────────── */
 initDb()
   .then(() =>
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`)),
