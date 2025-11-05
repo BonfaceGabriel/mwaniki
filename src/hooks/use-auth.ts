@@ -1,64 +1,51 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
-interface AuthState {
-  token: string | null;
-  user: { id: string; role: string } | null;
-  isAdmin: boolean;
+interface DecodedToken {
+  exp: number;
+  role: string;
 }
 
 const useAuth = () => {
-  const [authState, setAuthState] = useState<AuthState>({
-    token: null,
-    user: null,
-    isAdmin: false,
-  });
+  const [token, setToken] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
       try {
-        const decoded: { id: string; role: string; exp: number } =
-          jwtDecode(token);
+        const decoded = jwtDecode<DecodedToken>(storedToken);
         if (decoded.exp * 1000 > Date.now()) {
-          // Check if token is not expired
-          setAuthState({
-            token,
-            user: { id: decoded.id, role: decoded.role },
-            isAdmin: decoded.role === "admin",
-          });
+          setToken(storedToken);
+          setIsAdmin(decoded.role === "admin");
         } else {
-          localStorage.removeItem("token"); // Token expired, remove it
+          localStorage.removeItem("token");
         }
       } catch (error) {
-        console.error("Failed to decode token:", error);
+        console.error("Invalid token:", error);
         localStorage.removeItem("token");
       }
     }
   }, []);
 
-  const login = (token: string) => {
-    localStorage.setItem("token", token);
+  const login = (newToken: string) => {
+    localStorage.setItem("token", newToken);
     try {
-      const decoded: { id: string; role: string; exp: number } =
-        jwtDecode(token);
-      setAuthState({
-        token,
-        user: { id: decoded.id, role: decoded.role },
-        isAdmin: decoded.role === "admin",
-      });
+      const decoded = jwtDecode<DecodedToken>(newToken);
+      setToken(newToken);
+      setIsAdmin(decoded.role === "admin");
     } catch (error) {
-      console.error("Failed to decode token on login:", error);
-      setAuthState({ token: null, user: null, isAdmin: false });
+      console.error("Invalid token on login:", error);
     }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    setAuthState({ token: null, user: null, isAdmin: false });
+    setToken(null);
+    setIsAdmin(false);
   };
 
-  return { ...authState, login, logout };
+  return { token, isAdmin, login, logout };
 };
 
 export default useAuth;

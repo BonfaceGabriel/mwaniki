@@ -192,6 +192,57 @@ app.delete(
   },
 );
 
+/* ───────────────── Albums Endpoints ────────────────────────────────── */
+app.get("/albums", async (_req, res) => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM albums ORDER BY created_at DESC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching albums:", err);
+    res.status(500).json({ error: "Failed to fetch albums." });
+  }
+});
+
+app.post("/albums", auth, adminOnly, clearCache("photos"), async (req, res) => {
+  const { name, description } = req.body;
+  try {
+    const { rows } = await pool.query(
+      "INSERT INTO albums (name, description) VALUES ($1, $2) RETURNING *",
+      [name, description]
+    );
+    res.status(201).json(rows[0]);
+  } catch (err) {
+    console.error("Error creating album:", err);
+    res.status(500).json({ error: "Failed to create album." });
+  }
+});
+
+app.put("/albums/:id", auth, adminOnly, clearCache("photos"), async (req, res) => {
+  const { id } = req.params;
+  const { name, description } = req.body;
+  try {
+    const { rows } = await pool.query(
+      "UPDATE albums SET name = $1, description = $2 WHERE id = $3 RETURNING *",
+      [name, description, id]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error updating album:", err);
+    res.status(500).json({ error: "Failed to update album." });
+  }
+});
+
+app.delete("/albums/:id", auth, adminOnly, clearCache("photos"), async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM albums WHERE id = $1", [id]);
+    res.status(204).send();
+  } catch (err) {
+    console.error("Error deleting album:", err);
+    res.status(500).json({ error: "Failed to delete album." });
+  }
+});
+
 /* ───────────────── Site Settings Endpoints ────────────────────────── */
 app.get("/site-settings", async (_req, res) => {
   const cacheKey = "site-settings";
@@ -430,17 +481,22 @@ app.get("/photos", async (_req, res) => {
     return res.json(cache[cacheKey].data);
   }
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM photos ORDER BY timestamp DESC",
-    );
+    const { rows } = await pool.query(`
+      SELECT
+        p.*,
+        a.name as album_name,
+        a.description as album_description
+      FROM photos p
+      LEFT JOIN albums a ON p.album_id = a.id
+      ORDER BY p.timestamp DESC
+    `);
     cache[cacheKey] = {
       timestamp: now,
       data: rows,
     };
     console.log("Serving photos from DB and caching");
     res.json(rows);
-  } catch (err)
- {
+  } catch (err) {
     console.error("Error fetching photos:", err);
     res.status(500).json({ error: "Failed to fetch photos." });
   }
@@ -452,7 +508,7 @@ app.post(
   clearCache("photos"),
   async (req, res) => {
     const files = Array.isArray(req.files) ? req.files : [];
-    const { caption, name, email } = req.body;
+    const { caption, name, email, album_id } = req.body;
 
     if (name && email) {
       const userData = `Name: ${name}, Email: ${email}\n`;
@@ -490,8 +546,8 @@ app.post(
 
         /* save metadata in Postgres */
         const { rows } = await pool.query(
-          "INSERT INTO photos (id, src, caption, name, email) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-          [id, pub.publicUrl, caption, name, email],
+          "INSERT INTO photos (id, src, caption, name, email, album_id) VALUES ($1, $2, $3, $4, $5, $6::uuid) RETURNING *",
+          [id, pub.publicUrl, caption, name, email, album_id || null],
         );
         newPhotos.push(rows[0]);
       }
@@ -502,6 +558,77 @@ app.post(
       res.status(500).json({ error: "Failed to post photos." });
     }
   },
+);
+
+app.put(
+  "/photos/:id",
+  auth,
+  adminOnly,
+  clearCache("photos"),
+  async (req, res) => {
+    const { id } = req.params;
+    const { caption, album_id } = req.body;
+    try {
+      const { rows } = await pool.query(
+        "UPDATE photos SET caption = $1, album_id = $2::uuid WHERE id = $3 RETURNING *",
+        [caption, album_id, id]
+      );
+      res.json(rows[0]);
+    } catch (err) {
+      console.error("Error updating photo:", err);
+      res.status(500).json({ error: "Failed to update photo." });
+    }
+  }
+);
+
+app.post(
+  "/photos/bulk-move",
+  auth,
+  adminOnly,
+  clearCache("photos"),
+  async (req, res) => {
+    const { photoIds, albumId } = req.body;
+    try {
+      const result = await pool.query(
+        "UPDATE photos SET album_id = $1::uuid WHERE id = ANY($2::varchar[])",
+        [albumId, photoIds]
+      );
+      res.status(200).json({ message: `${result.rowCount} photos moved.` });
+    } catch (err) {
+      console.error("Error bulk moving photos:", err);
+      res.status(500).json({ error: "Failed to move photos." });
+    }
+  }
+);
+
+app.post(
+  "/photos/bulk-delete",
+  auth,
+  adminOnly,
+  clearCache("photos"),
+  async (req, res) => {
+    const { photoIds } = req.body;
+    try {
+      // First, get the photo srcs to delete from Supabase
+      const { rows } = await pool.query(
+        "SELECT src FROM photos WHERE id = ANY($1::varchar[])",
+        [photoIds]
+      );
+
+      if (rows.length > 0) {
+        const filenames = rows.map(row => path.basename(new URL(row.src).pathname));
+        // Delete from Supabase
+        await supabase.storage.from(BUCKET).remove(filenames);
+      }
+
+      // Delete from database
+      await pool.query("DELETE FROM photos WHERE id = ANY($1::varchar[])", [photoIds]);
+      res.status(200).json({ message: `${rows.length} photos deleted.` });
+    } catch (err) {
+      console.error("Error bulk deleting photos:", err);
+      res.status(500).json({ error: "Failed to delete photos." });
+    }
+  }
 );
 
 app.delete(
