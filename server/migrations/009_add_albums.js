@@ -2,7 +2,7 @@ const { pool } = require('../db');
 
 const up = async () => {
   await pool.query(`
-    CREATE TABLE albums (
+    CREATE TABLE IF NOT EXISTS albums (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       name VARCHAR(255) NOT NULL,
       description TEXT,

@@ -1,11 +1,22 @@
 const { pool } = require('../db');
 
 const up = async () => {
-  await pool.query(`
-    ALTER TABLE photos
-    ADD COLUMN album_id UUID REFERENCES albums(id) ON DELETE SET NULL;
+  // Check if column already exists before adding it
+  const { rows } = await pool.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_name='photos' AND column_name='album_id';
   `);
-  console.log('Migration 010_add_album_id_to_photos up executed successfully');
+
+  if (rows.length === 0) {
+    await pool.query(`
+      ALTER TABLE photos
+      ADD COLUMN album_id UUID REFERENCES albums(id) ON DELETE SET NULL;
+    `);
+    console.log('Migration 010_add_album_id_to_photos up executed successfully');
+  } else {
+    console.log('Migration 010_add_album_id_to_photos: column already exists, skipping');
+  }
 };
 
 const down = async () => {
